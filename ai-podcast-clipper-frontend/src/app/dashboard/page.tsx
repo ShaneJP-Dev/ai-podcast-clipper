@@ -1,9 +1,11 @@
+/* eslint-disable react/jsx-no-duplicate-props */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use server"
 
 import { create } from "domain";
 import { redirect } from "next/navigation";
+import { DashboardClient } from "~/components/dashboard-client";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 
@@ -13,8 +15,6 @@ export default async function DashboardPage() {
     if (!session?.user?.id) {
         redirect("/login");
     }
-
-    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     const userData = await db.user.findUnique({
         where: { id: session.user.id },
@@ -44,14 +44,22 @@ export default async function DashboardPage() {
         },
     });
 
-    const formattedFiles = userData?.uploadedFiles.map((file) => ({
+     if (!userData) {
+        redirect("/login");
+    }
+
+    const formattedFiles = userData.uploadedFiles.map((file) => ({
         id: file.id,
         s3Key: file.s3Key,
-        fileName: file.displayName || "Unkown filename",
+        fileName: file.displayName || "Unknown filename",
         status: file.status,
         createdAt: file.createdAt,
         clipCount: file._count.Clip,
-    }))
+    }));
 
-    return <h1>Helklo</h1>
+    return <DashboardClient 
+        uploadedFiles={formattedFiles} 
+        clips={userData.clips} 
+        
+    />
 }
