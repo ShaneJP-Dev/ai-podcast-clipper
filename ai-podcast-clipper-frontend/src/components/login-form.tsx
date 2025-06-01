@@ -1,9 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
 
 import { cn } from "~/lib/utils"
@@ -17,7 +11,6 @@ import {
 } from "~/components/ui/card"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
-import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import React from "react"
@@ -58,7 +51,8 @@ export function LoginForm({
         // Redirect to the dashboard or home page after successful sign up
         router.push("/dashboard");
       }
-    }catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    }catch (error) {
       setError("An error occurred while signing up. Please try again.");
     }finally {
       setIsSubmitting(false);

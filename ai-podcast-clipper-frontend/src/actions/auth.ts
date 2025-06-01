@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 "use server";
 
@@ -51,6 +48,7 @@ export async function signUpUser(data: SignUpFormValues): Promise<SingupResult> 
         })
 
         return {success: true};
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     }catch (error) {
         return{
             success: false, 
