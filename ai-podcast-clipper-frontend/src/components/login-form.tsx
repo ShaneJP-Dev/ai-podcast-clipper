@@ -22,12 +22,12 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import React from "react"
 import Link from "next/link";
-import { SignUpSchema, type SignUpFormValues } from "~/schemas/auth";
-import { signUpUser } from "~/actions/auth";
+import { LoginSchema,  type LoginFormValues } from "~/schemas/auth";
+
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-export function SignUpForm({
+export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -35,27 +35,25 @@ export function SignUpForm({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const router = useRouter();
 
-  const {register, handleSubmit, formState: {errors}} = useForm<SignUpFormValues>({resolver: zodResolver(SignUpSchema)});
+  const {
+    register, 
+    handleSubmit, 
+    formState: {errors}
+  } = useForm<LoginFormValues>({resolver: zodResolver(LoginSchema)});
 
-  const onSubmit = async (data: SignUpFormValues) => {
+  const onSubmit = async (data: LoginFormValues) => {
     try{
       setIsSubmitting(true);
       setError(null);
-
-      const result = await signUpUser(data);
-      if (!result.success) {
-        setError(result.errors || "An error occurred. Please try again.");
-        return;
-      }
       
-      const signUpResult = await signIn("credentials", {
+      const signInResult = await signIn("credentials", {
         email: data.email, 
         password: data.password, 
         redirect: false 
       });
 
-      if (signUpResult?.error) {
-        setError("Account created, but automatic sign in failed. Please try again.");
+      if (signInResult?.error) {
+        setError("Invalid email or password. Please try again.");
       } else {
         // Redirect to the dashboard or home page after successful sign up
         router.push("/dashboard");
@@ -71,9 +69,9 @@ export function SignUpForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Sign Up</CardTitle>
+          <CardTitle>Login</CardTitle>
           <CardDescription>
-            Enter your email below to swign up to your account
+            Enter your email below to log in to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -120,13 +118,13 @@ export function SignUpForm({
 
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? "Signing Up..." : "Sign Up"}
+                  {isSubmitting ? "Login In..." : "Login"}
                 </Button>
               </div>
             </div>
             <div className="mt-4 text-center text-sm">
-              Already have an account?{" "}
-              <Link href="/login" className="underline underline-offset-4">
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" className="underline underline-offset-4">
                 Sign in
               </Link>
             </div>
