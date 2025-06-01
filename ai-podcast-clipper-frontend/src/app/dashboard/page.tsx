@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use server"
 
@@ -12,6 +13,9 @@ export default async function DashboardPage() {
     if (!session?.user?.id) {
         redirect("/login");
     }
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
     const userData = await db.user.findUnique({
         where: { id: session.user.id },
         select: {
@@ -38,7 +42,16 @@ export default async function DashboardPage() {
                 }
             },
         },
-    })
+    });
+
+    const formattedFiles = userData?.uploadedFiles.map((file) => ({
+        id: file.id,
+        s3Key: file.s3Key,
+        fileName: file.displayName || "Unkown filename",
+        status: file.status,
+        createdAt: file.createdAt,
+        clipCount: file._count.Clip,
+    }))
 
     return <h1>Helklo</h1>
 }
