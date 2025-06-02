@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
 
 import Dropzone, { type DropzoneState } from "shadcn-dropzone";
@@ -28,7 +27,6 @@ import {
 } from "./ui/table";
 import { Badge } from "./ui/badge";
 import { useRouter } from "next/navigation";
-import { set } from "zod";
 import { ClipDisplay } from "./clip-display";
 
 export function DashboardClient({
@@ -99,6 +97,7 @@ export function DashboardClient({
           "There was an error uploading your file. Please try again.",
         duration: 5000,
       });
+      console.error("Upload error:", error);
     } finally {
       setUploading(false);
     }
@@ -141,7 +140,7 @@ export function DashboardClient({
                 disabled={uploading}
                 maxFiles={1}
               >
-                {(dropzone: DropzoneState) => (
+                {(_dropzone: DropzoneState) => (
                   <>
                     <div className="flex flex-col items-center justify-center space-y-4 rounded-lg p-10 text-center">
                       <UploadCloud className="text-muted-foreground h-12 w-12" />

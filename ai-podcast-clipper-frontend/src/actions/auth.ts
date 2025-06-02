@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 "use server";
 
 import { hashPassword } from "~/lib/auth";
 import { SignUpSchema, type SignUpFormValues } from "~/schemas/auth";
 import { db } from "~/server/db";
-import Stripe from "stripe";
 
 type SingupResult = {
     success: boolean;
@@ -16,7 +14,7 @@ export async function signUpUser(data: SignUpFormValues): Promise<SingupResult> 
     if (!validationResult.success) {
         return {
             success: false, 
-            errors: validationResult.error.issues[0]?.message || "Invalid input"
+            errors: validationResult.error.issues[0]?.message ?? "Invalid input"
         };
     }
 

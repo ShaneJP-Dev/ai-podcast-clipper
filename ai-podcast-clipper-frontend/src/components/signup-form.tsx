@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 "use client";
 
 import { cn } from "~/lib/utils"
@@ -38,7 +38,7 @@ export function SignUpForm({
 
       const result = await signUpUser(data);
       if (!result.success) {
-        setError(result.errors || "An error occurred. Please try again.");
+        setError(result.errors ?? "An error occurred. Please try again.");
         return;
       }
       

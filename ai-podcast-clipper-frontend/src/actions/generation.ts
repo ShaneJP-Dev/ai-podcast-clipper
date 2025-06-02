@@ -3,7 +3,6 @@
 
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { get } from "http";
 import { revalidatePath } from "next/cache";
 import { env } from "~/env";
 import { inngest } from "~/inngest/client";
@@ -73,6 +72,6 @@ export async function getClipPlayUrl(clipId: string): Promise<{success: boolean;
       return { success: true, url: signedUrl };
 
   } catch (error) {
-    return {success: false, error: "Failed to retrieve clip play URL."};
+    return {success: false, error: "Failed to retrieve clip play URL." + (error instanceof Error ? `: ${error.message}` : "")};
   }
 }

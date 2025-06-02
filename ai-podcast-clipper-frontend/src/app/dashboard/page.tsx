@@ -1,9 +1,6 @@
-/* eslint-disable react/jsx-no-duplicate-props */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 "use server"
 
-import { create } from "domain";
 import { redirect } from "next/navigation";
 import { DashboardClient } from "~/components/dashboard-client";
 import { auth } from "~/server/auth";
@@ -51,7 +48,7 @@ export default async function DashboardPage() {
     const formattedFiles = userData.uploadedFiles.map((file) => ({
         id: file.id,
         s3Key: file.s3Key,
-        fileName: file.displayName || "Unknown filename",
+        fileName: file.displayName ?? "Unknown filename",
         status: file.status,
         createdAt: file.createdAt,
         clipCount: file._count.Clip,

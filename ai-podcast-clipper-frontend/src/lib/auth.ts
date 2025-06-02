@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { hash, compare } from 'bcryptjs';
 
 export async function hashPassword(password: string) {

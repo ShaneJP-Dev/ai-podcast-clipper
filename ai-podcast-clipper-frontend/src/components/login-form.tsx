@@ -51,9 +51,11 @@ export function LoginForm({
         // Redirect to the dashboard or home page after successful sign up
         router.push("/dashboard");
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     }catch (error) {
-      setError("An error occurred while signing up. Please try again.");
+      setError(
+        "An error occurred while signing up. Please try again." +
+        (error instanceof Error ? " " + error.message : "")
+      );
     }finally {
       setIsSubmitting(false);
     }
