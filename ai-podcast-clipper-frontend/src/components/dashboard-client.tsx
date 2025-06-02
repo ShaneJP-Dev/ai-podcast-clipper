@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
 
 import Dropzone, { type DropzoneState } from "shadcn-dropzone";
@@ -17,6 +18,18 @@ import { useState } from "react";
 import { generateUploadUrl } from "~/actions/s3";
 import { toast } from "sonner";
 import { processVideo } from "~/actions/generation";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
+import { Badge } from "./ui/badge";
+import { useRouter } from "next/navigation";
+import { set } from "zod";
+import { ClipDisplay } from "./clip-display";
 
 export function DashboardClient({
   uploadedFiles,
@@ -34,6 +47,14 @@ export function DashboardClient({
 }) {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const router = useRouter();
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    router.refresh();
+    setTimeout(() => setRefreshing(false), 600);
+  };
 
   const handleDrop = (acceptedFiles: File[]) => {
     setFiles(acceptedFiles);
@@ -67,20 +88,19 @@ export function DashboardClient({
       await processVideo(uploadedFileId);
 
       setFiles([]);
-    
+
       toast.success("Video uploaded successfully", {
         description: "Your video is being processed. Check the status below.",
-        duration: 5000
+        duration: 5000,
       });
-
     } catch (error) {
       toast.error("Upload failed", {
-        description: "There was an error uploading your file. Please try again.",
-        duration: 5000
-      })
+        description:
+          "There was an error uploading your file. Please try again.",
+        duration: 5000,
+      });
     } finally {
       setUploading(false);
-    
     }
   };
 
@@ -142,7 +162,7 @@ export function DashboardClient({
                 )}
               </Dropzone>
 
-              <div className="flex items-start justify-between">
+              <div className="flex items-start mt-2 justify-between">
                 <div>
                   {files.length > 0 && (
                     <div className="space-y-1 text-sm">
@@ -169,6 +189,94 @@ export function DashboardClient({
                   )}
                 </Button>
               </div>
+
+              {uploadedFiles.length > 0 && (
+                <div className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-md mb-2 font-medium">Queue status</h3>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRefresh}
+                      disabled={refreshing}
+                      className="mb-3"
+                    >
+                      {refreshing && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}{" "}
+                      Refresh
+                    </Button>
+                  </div>
+                  <div className="max-h-[300px] overflow-auto rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>File</TableHead>
+                          <TableHead>Uploaded</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Clip Created</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {uploadedFiles.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell className="max-w-xs truncate font-medium">
+                              {item.fileName}
+                            </TableCell>
+                            <TableCell className="text-muted-foreground text-sm">
+                              {new Date(item.createdAt).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell className="text-muted-foreground text-sm">
+                              {item.status === "queued" && (
+                                <Badge variant="outline">Queued</Badge>
+                              )}
+                              {item.status === "processing" && (
+                                <Badge variant="outline">Processing</Badge>
+                              )}
+                              {item.status === "processed" && (
+                                <Badge variant="outline">Processed</Badge>
+                              )}
+                              {item.status === "no credits" && (
+                                <Badge variant="destructive">No credits</Badge>
+                              )}
+                              {item.status === "failed" && (
+                                <Badge variant="destructive">Failed</Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {item.clipCount > 0 ? (
+                                <span>
+                                  {item.clipCount} clip
+                                  {item.clipCount !== 1 ? "s" : ""}
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">
+                                  No clips yet
+                                </span>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="my-clips">
+          <Card>
+            <CardHeader>
+              <CardTitle>My Clips</CardTitle>
+              <CardDescription>
+                View and manage your generated clips from uploaded podcasts.
+                Processing may take a few minutes
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ClipDisplay clips={clips} />
             </CardContent>
           </Card>
         </TabsContent>
